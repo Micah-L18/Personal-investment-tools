@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Research App</title>
+    <link rel="stylesheet" href="/public/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <h1 style="text-align: center;">Welcome to the basic stock research app!</h1>
+    
+    <div class="container">
+        <input type="text" id="searchBar" placeholder="Search for a stock ticker...">
+        <button id="searchButton">Search</button>
+        
+        <div class="chart-container">
+            <canvas id="stockChart"></canvas>
+        </div>
+
+        <div>
+            <h2>Symbol:</h2>
+            <p id="stockSymbol"></p>
+            
+            <h2>Price:</h2>
+            <p id="stockPrice"></p>
+    
+            <h2>52 High:</h2>
+            <p id="stock52High"></p>
+    
+            <h2>52 Low:</h2>
+            <p id="stock52Low"></p>
+        </div>
+        
+    </div>
+
+    <div id="stockData"></div>
+
+    <script>
+        let stockChart = null;
+
+        document.getElementById("searchButton").addEventListener("click", function() {
+            const ticker = document.getElementById("searchBar").value;
+            fetch(`/api/stock?ticker=${ticker}`)
+                .then(response => response.json())
+                .then(data => {
+                    // console.log("Stock data:", data);
+                    const stockDataDiv = document.getElementById("stockData");
+                    stockDataDiv.innerHTML = JSON.stringify(data, null, 2);
+                    document.getElementById("stockSymbol").innerText = data.chart.result[0].meta.symbol || "N/A";
+                    document.getElementById("stockPrice").innerText = "$"+data.chart.result[0].meta.regularMarketPrice || "N/A";
+                    document.getElementById("stock52High").innerText = "$"+data.chart.result[0].meta.fiftyTwoWeekHigh || "N/A";
+                    document.getElementById("stock52Low").innerText = "$"+data.chart.result[0].meta.fiftyTwoWeekLow || "N/A";
+                    
+                    // Create chart
+                    createStockChart(data);
+                })
+                .catch(error => {
+                    console.error("Error fetching stock data:", error);
+                });
+        });
+
+        function createStockChart(data) {
+            const chartData = data.chart.result[0];
+            const timestamps = chartData.timestamp;
+            const indicators = chartData.indicators.quote[0];
+            
+            // Convert timestamps to readable labels (time format)
+            const labels = timestamps.map(timestamp => {
+                const date = new Date(timestamp * 1000);
+                return date.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                });
+            });
+
+            // Filter out null values for cleaner chart
+            const cleanData = [];
+            for (let i = 0; i < indicators.close.length; i++) {
+                if (indicators.close[i] !== null) {
+                    cleanData.push({
+                        x: labels[i],
+                        y: indicators.close[i]
+                    });
+                }
+            }
+
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (stockChart) {
+                stockChart.destroy();
+            }
+
+            stockChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: `${chartData.meta.symbol} Price`,
+                        data: cleanData,
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#4f46e5',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: `${chartData.meta.symbol} - ${chartData.meta.longName || 'Stock Price Chart'}`,
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            color: '#374151',
+                            padding: 20
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            cornerRadius: 8,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `Price: $${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'category',
+                            display: true,
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxTicksLimit: 8,
+                                color: '#6b7280',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Time',
+                                color: '#374151',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        y: {
+                            display: true,
+                            grid: {
+                                color: 'rgba(107, 114, 128, 0.1)',
+                                borderDash: [5, 5]
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                font: {
+                                    size: 12
+                                },
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Price ($)',
+                                color: '#374151',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        line: {
+                            borderJoinStyle: 'round',
+                            borderCapStyle: 'round'
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            top: 10,
+                            bottom: 10,
+                            left: 10,
+                            right: 10
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
