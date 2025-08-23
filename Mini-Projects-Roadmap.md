@@ -4,4 +4,4 @@ Each project can be built using modern frameworks and libraries, and is suitable
 
 1. Basic stock research api
 2. Basic stock list
-2. Basic portfolio
+3. Basic portfolio

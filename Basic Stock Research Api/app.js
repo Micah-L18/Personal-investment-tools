@@ -14,9 +14,10 @@ app.use('/public',express.static(path.join(path.dirname(fileURLToPath(import.met
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// app.get('/', (req, res) => {
-//     res.send('Hello World!');
-// });
+app.get('/', (req, res) => {
+    // re route to /home
+    res.redirect('/home');
+});
 
 app.get('/home', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'));
