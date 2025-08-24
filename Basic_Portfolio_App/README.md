@@ -40,3 +40,4 @@ To run with functionality
 - cd ./Personal-intestment-tools/Basic \Stock \Research \Api/nodemon app.js
     - runs Basic Stock Research Api on localhost:3001
 
+- all data is stored through local storage and pulled from the basic stock research api
