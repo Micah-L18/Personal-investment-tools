@@ -1,0 +1,117 @@
+<div class="search-container">
+  <mat-card class="search-card">
+    <mat-card-header>
+      <mat-card-title>Stock Search</mat-card-title>
+      <mat-card-subtitle>Search for stock information</mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="search-form">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Enter stock ticker (e.g., AAPL, TSLA)</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="onSearch()"
+            placeholder="Stock ticker..."
+            [disabled]="isLoading">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        
+        <div class="search-buttons">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            (click)="onSearch()"
+            [disabled]="isLoading || !searchQuery.trim()">
+            <mat-icon>search</mat-icon>
+            Search
+          </button>
+          
+          <button 
+            mat-stroked-button 
+            (click)="clearSearch()"
+            [disabled]="isLoading">
+            <mat-icon>clear</mat-icon>
+            Clear
+          </button>
+        </div>
+      </div>
+      
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Searching...</p>
+      </div>
+      
+      <!-- Error Message -->
+      <div *ngIf="error" class="error-message">
+        <mat-icon color="warn">error</mat-icon>
+        <span>{{ error }}</span>
+      </div>
+      
+      <!-- Search Results -->
+      <div *ngIf="searchResults && !isLoading" class="results-container">
+        <!-- Formatted Stock Metrics -->
+        <mat-card class="metrics-card" *ngIf="stockMetrics">
+          <mat-card-header>
+            <mat-card-title>{{ stockMetrics.symbol }} - {{ stockMetrics.name }}</mat-card-title>
+            <mat-card-subtitle>{{ stockMetrics.exchange }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="metrics-grid">
+              <div class="metric-item">
+                <span class="metric-label">Current Price:</span>
+                <span class="metric-value price">{{ stockMetrics.currentPrice | currency:stockMetrics.currency }}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Day High:</span>
+                <span class="metric-value">{{ stockMetrics.dayHigh | currency:stockMetrics.currency }}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Day Low:</span>
+                <span class="metric-value">{{ stockMetrics.dayLow | currency:stockMetrics.currency }}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">52W High:</span>
+                <span class="metric-value">{{ stockMetrics.fiftyTwoWeekHigh | currency:stockMetrics.currency }}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">52W Low:</span>
+                <span class="metric-value">{{ stockMetrics.fiftyTwoWeekLow | currency:stockMetrics.currency }}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Volume:</span>
+                <span class="metric-value">{{ stockMetrics.volume | number }}</span>
+              </div>
+            </div>
+            
+            <!-- Add to Portfolio Button -->
+            <div class="portfolio-actions">
+              <button 
+                mat-raised-button 
+                color="accent"
+                (click)="addToPortfolio()"
+                [disabled]="isInPortfolio()"
+                class="add-portfolio-btn">
+                <mat-icon>{{ isInPortfolio() ? 'check' : 'add' }}</mat-icon>
+                {{ isInPortfolio() ? 'Already in Portfolio' : 'Add to Portfolio' }}
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Raw JSON Data
+        <mat-card class="results-card">
+          <mat-card-header>
+            <mat-card-title>Raw API Response</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <pre>{{ searchResults | json }}</pre>
+          </mat-card-content>
+        </mat-card> -->
+        
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

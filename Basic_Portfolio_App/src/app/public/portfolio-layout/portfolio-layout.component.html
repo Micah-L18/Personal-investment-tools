@@ -1,0 +1,224 @@
+<div class="portfolio-container">
+  <!-- Portfolio Header -->
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>My Portfolio</mat-card-title>
+      <mat-card-subtitle>Track your stock investments</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="portfolio-stats">
+        <div class="stat-item">
+          <span class="stat-label">Stock Positions:</span>
+          <span class="stat-value">{{ portfolioStats.totalStocks }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Stock Value:</span>
+          <span class="stat-value">{{ portfolioStats.stockValue | currency:'USD' }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Cash:</span>
+          <span class="stat-value cash-value">{{ portfolioStats.cashValue | currency:'USD' }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Total Value:</span>
+          <span class="stat-value total-value">{{ portfolioStats.totalValue | currency:'USD' }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Gain/Loss:</span>
+          <span class="stat-value" 
+                [class.positive]="portfolioStats.totalGainLoss >= 0" 
+                [class.negative]="portfolioStats.totalGainLoss < 0">
+            {{ portfolioStats.totalGainLoss | currency:'USD' }}
+          </span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">% Change:</span>
+          <span class="stat-value" 
+                [class.positive]="portfolioStats.totalGainLossPercent >= 0" 
+                [class.negative]="portfolioStats.totalGainLossPercent < 0">
+            {{ portfolioStats.totalGainLossPercent | number:'1.2-2' }}%
+          </span>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button mat-raised-button color="primary" routerLink="/search">
+          <mat-icon>search</mat-icon>
+          Add Stocks
+        </button>
+        <button 
+          mat-stroked-button 
+          color="accent"
+          (click)="refreshPrices()"
+          [disabled]="isUpdatingPrices || portfolioStats.totalStocks === 0">
+          <mat-icon>refresh</mat-icon>
+          Update Prices
+        </button>
+        <button 
+          mat-stroked-button 
+          color="warn" 
+          (click)="clearPortfolio()"
+          [disabled]="portfolioStats.totalStocks === 0">
+          <mat-icon>clear_all</mat-icon>
+          Clear Portfolio
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Portfolio Table -->
+  <mat-card class="portfolio-table-card" *ngIf="dataSource.data.length > 0 || (portfolio$ | async)?.length === 0">
+    <mat-card-content>
+      <div *ngIf="dataSource.data.length === 0" class="empty-portfolio">
+        <mat-icon class="empty-icon">trending_up</mat-icon>
+        <h3>Your portfolio is empty</h3>
+        <p>Start by searching for stocks and adding them to your portfolio.</p>
+        <button mat-raised-button color="primary" routerLink="/search">
+          <mat-icon>add</mat-icon>
+          Add Your First Stock
+        </button>
+      </div>
+
+      <div *ngIf="dataSource.data.length > 0" class="portfolio-table">
+        <table mat-table [dataSource]="dataSource" matSort class="portfolio-table">
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="symbol">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Symbol</th>
+            <td mat-cell *matCellDef="let stock">
+              <div class="symbol-cell">
+                <strong [class.cash-symbol]="stock.isCash">{{ stock.symbol }}</strong>
+                <small *ngIf="!stock.isCash">{{ stock.exchange }}</small>
+                <small *ngIf="stock.isCash" class="cash-label">Cash Position</small>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Company</th>
+            <td mat-cell *matCellDef="let stock">{{ stock.name }}</td>
+          </ng-container>
+
+          <!-- Current Price Column -->
+          <ng-container matColumnDef="currentPrice">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
+            <td mat-cell *matCellDef="let stock">
+              {{ stock.currentPrice | currency:stock.currency }}
+            </td>
+          </ng-container>
+
+          <!-- Quantity Column -->
+          <ng-container matColumnDef="quantity">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'Quantity' }}</th>
+            <td mat-cell *matCellDef="let stock">
+              <div *ngIf="!isEditing(stock.symbol)" class="view-mode">
+                <span *ngIf="!stock.isCash">{{ stock.shares || 0 | number:'1.0-4' }}</span>
+                <span *ngIf="stock.isCash">{{ stock.shares || 0 | currency:'USD' }}</span>
+              </div>
+              <mat-form-field *ngIf="isEditing(stock.symbol)" appearance="outline" class="edit-field">
+                <mat-label>{{ stock.isCash ? 'Cash Amount' : 'Shares' }}</mat-label>
+                <input matInput 
+                       type="number" 
+                       [step]="stock.isCash ? '0.01' : '0.0001'"
+                       [(ngModel)]="stock.shares" 
+                       [placeholder]="stock.isCash ? '0.00' : '0.0000'">
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <!-- Average Cost Column -->
+          <ng-container matColumnDef="avgCost">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Avg Cost</th>
+            <td mat-cell *matCellDef="let stock">
+              <div *ngIf="!isEditing(stock.symbol)" class="view-mode">
+                <span *ngIf="!stock.isCash">{{ stock.avgCost || 0 | currency:stock.currency }}</span>
+                <span *ngIf="stock.isCash">N/A</span>
+              </div>
+              <mat-form-field *ngIf="isEditing(stock.symbol) && !stock.isCash" appearance="outline" class="edit-field">
+                <input matInput 
+                       type="number" 
+                       step="0.01"
+                       [(ngModel)]="stock.avgCost" 
+                       placeholder="0.00">
+              </mat-form-field>
+              <span *ngIf="isEditing(stock.symbol) && stock.isCash" class="cash-na">N/A</span>
+            </td>
+          </ng-container>
+
+          <!-- Equity Column -->
+          <ng-container matColumnDef="equity">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Equity</th>
+            <td mat-cell *matCellDef="let stock">
+              <strong class="equity-value" 
+                      [class.positive]="calculateEquity(stock) > 0"
+                      [class.negative]="calculateEquity(stock) < 0">
+                {{ calculateEquity(stock) | currency:stock.currency }}
+              </strong>
+            </td>
+          </ng-container>
+
+          <!-- Percent Change Column -->
+          <ng-container matColumnDef="percentChange">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>% Change</th>
+            <td mat-cell *matCellDef="let stock">
+              <span *ngIf="!stock.isCash" 
+                    class="percent-change"
+                    [class.positive]="calculatePercentChange(stock) >= 0"
+                    [class.negative]="calculatePercentChange(stock) < 0">
+                {{ calculatePercentChange(stock) | number:'1.2-2' }}%
+              </span>
+              <span *ngIf="stock.isCash" class="cash-stable">0.00%</span>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let stock">
+              <div class="action-buttons">
+                <!-- Edit Mode Actions -->
+                <div *ngIf="isEditing(stock.symbol)" class="edit-actions">
+                  <button 
+                    mat-icon-button 
+                    color="primary"
+                    (click)="saveStock(stock)"
+                    matTooltip="Save changes">
+                    <mat-icon>save</mat-icon>
+                  </button>
+                  <button 
+                    mat-icon-button 
+                    (click)="cancelEditing()"
+                    matTooltip="Cancel editing">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </div>
+                
+                <!-- View Mode Actions -->
+                <div *ngIf="!isEditing(stock.symbol)" class="view-actions">
+                  <button 
+                    mat-icon-button 
+                    (click)="startEditing(stock.symbol)"
+                    matTooltip="Edit position">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button 
+                    mat-icon-button 
+                    color="warn"
+                    (click)="removeFromPortfolio(stock.symbol, stock.name)"
+                    [disabled]="stock.isCash"
+                    [matTooltip]="stock.isCash ? 'Cash position cannot be removed' : 'Remove from portfolio'">
+                    <mat-icon>{{ stock.isCash ? 'block' : 'delete' }}</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+              [class.cash-row]="row.isCash"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

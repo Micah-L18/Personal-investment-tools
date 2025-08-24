@@ -1,0 +1,43 @@
+// Modern app component styles
+
+.mat-toolbar {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid var(--border-light);
+  height: 64px;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.mat-mdc-button {
+  color: var(--text-secondary) !important;
+  border-radius: 6px;
+  margin: 0 2px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  
+  &:hover {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+  }
+  
+  &.active {
+    background-color: var(--accent-blue) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+  }
+  
+  mat-icon {
+    margin-right: 6px;
+  }
+}
+
+// Global body background for modern dark mode
+body {
+  margin: 0;
+  background: var(--bg-primary);
+  min-height: 100vh;
+}

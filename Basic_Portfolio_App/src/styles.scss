@@ -1,0 +1,230 @@
+/* Global Dark Mode styles and color scheme - Modern & Sleek */
+
+:root {
+  /* Modern Dark Primary Palette */
+  --primary-50: #0a0c10;
+  --primary-100: #1a1d23;
+  --primary-200: #242830;
+  --primary-300: #2e333d;
+  --primary-400: #383e4a;
+  --primary-500: #424957;
+  --primary-600: #4c5464;
+  --primary-700: #566071;
+  --primary-800: #606b7e;
+  --primary-900: #6a768b;
+
+  /* Modern Accent Colors */
+  --accent-blue: #3b82f6;
+  --accent-purple: #8b5cf6;
+  --accent-cyan: #06b6d4;
+  --accent-indigo: #6366f1;
+
+  /* Modern Success/Green Colors */
+  --success-50: #051f0d;
+  --success-100: #0f2f1a;
+  --success-200: #16a34a;
+  --success-300: #22c55e;
+  --success-400: #4ade80;
+  --success-500: #10b981;
+  --success-600: #059669;
+  --success-700: #047857;
+  --success-800: #065f46;
+  --success-900: #064e3b;
+
+  /* Modern Error/Red Colors */
+  --error-50: #1f0c0c;
+  --error-100: #2f1818;
+  --error-200: #dc2626;
+  --error-300: #ef4444;
+  --error-400: #f87171;
+  --error-500: #f44336;
+  --error-600: #dc2626;
+  --error-700: #b91c1c;
+  --error-800: #991b1b;
+  --error-900: #7f1d1d;
+
+  /* Dark Mode Error/Red Colors */
+  --error-50: #1a0e0e;
+  --error-100: #2e1c1c;
+  --error-200: #422a2a;
+  --error-300: #563838;
+  --error-400: #6a4646;
+  --error-500: #7e5454;
+  --error-600: #926262;
+  --error-700: #a67070;
+  --error-800: #ba7e7e;
+  --error-900: #ce8c8c;
+
+  /* Modern Neutral Colors */
+  --neutral-50: #09090b;
+  --neutral-100: #18181b;
+  --neutral-200: #27272a;
+  --neutral-300: #3f3f46;
+  --neutral-400: #52525b;
+  --neutral-500: #71717a;
+  --neutral-600: #a1a1aa;
+  --neutral-700: #d4d4d8;
+  --neutral-800: #e4e4e7;
+  --neutral-900: #f4f4f5;
+
+  /* Modern Background Colors */
+  --bg-primary: #09090b;
+  --bg-secondary: #18181b;
+  --bg-tertiary: #27272a;
+  --bg-quaternary: #3f3f46;
+
+  /* Modern Text Colors */
+  --text-primary: #fafafa;
+  --text-secondary: #d4d4d8;
+  --text-tertiary: #a1a1aa;
+  --text-disabled: #71717a;
+  --text-hint: #52525b;
+
+  /* Modern Border Colors */
+  --border-light: #27272a;
+  --border-medium: #3f3f46;
+  --border-strong: #52525b;
+
+  /* Modern Shadows - Subtle and refined */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+html, body { 
+  height: 100%; 
+  margin: 0; 
+  font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Modern Dark Mode Global Component Styling */
+.mat-mdc-card {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+}
+
+.mat-mdc-card-title {
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-card-content {
+  color: var(--text-primary) !important;
+}
+
+/* Button styling for dark mode */
+.mat-mdc-button.mat-primary,
+.mat-mdc-raised-button.mat-primary {
+  --mdc-filled-button-container-color: var(--primary-600) !important;
+  --mdc-filled-button-label-text-color: var(--text-primary) !important;
+  --mdc-text-button-label-text-color: var(--primary-600) !important;
+}
+
+.mat-mdc-button.mat-accent,
+.mat-mdc-raised-button.mat-accent {
+  --mdc-filled-button-container-color: var(--secondary-600) !important;
+  --mdc-filled-button-label-text-color: var(--text-primary) !important;
+  --mdc-text-button-label-text-color: var(--secondary-600) !important;
+}
+
+/* Form field styling for dark mode */
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: var(--border-light) !important;
+  --mdc-outlined-text-field-focus-outline-color: var(--primary-600) !important;
+  --mdc-outlined-text-field-label-text-color: var(--text-secondary) !important;
+  --mdc-outlined-text-field-input-text-color: var(--text-primary) !important;
+}
+
+.mat-mdc-input-element {
+  color: var(--text-primary) !important;
+}
+
+/* Toolbar styling for dark mode */
+.mat-toolbar {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Table styling for dark mode */
+.mat-mdc-table {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-header-row {
+  background: linear-gradient(135deg, var(--primary-600), var(--primary-700)) !important;
+}
+
+.mat-mdc-header-cell {
+  color: var(--text-primary) !important;
+  background: transparent !important;
+}
+
+.mat-mdc-row {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--border-light) !important;
+  
+  &:hover {
+    background: var(--bg-tertiary) !important;
+  }
+}
+
+.mat-mdc-cell {
+  color: var(--text-primary) !important;
+}
+
+.positive {
+  color: var(--success-600) !important;
+}
+
+.negative {
+  color: var(--error-600) !important;
+}
+
+.neutral {
+  color: var(--text-secondary) !important;
+}
+
+/* Table sorting styles for dark mode */
+.mat-sort-header-container {
+  color: var(--text-primary) !important;
+  
+  &:hover {
+    color: var(--primary-200) !important;
+  }
+}
+
+.mat-sort-header-sorted {
+  .mat-sort-header-container {
+    color: var(--primary-200) !important;
+  }
+}
+
+.mat-sort-header-arrow {
+  color: var(--primary-200) !important;
+}
+
+.mat-sort-header-button {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  color: var(--text-primary) !important;
+  font: inherit !important;
+  cursor: pointer !important;
+  
+  &:focus {
+    outline: 2px solid var(--primary-200) !important;
+    outline-offset: 2px !important;
+    border-radius: 4px !important;
+  }
+}
