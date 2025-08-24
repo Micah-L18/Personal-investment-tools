@@ -1,5 +1,8 @@
 # Personal-investment-tools
 
+## *Description*
+
+## *Tools
 1. Basic Stock Search
     - includes a chart and basic data on the stock
     - api with an endpoint that returns stock info (Example: " /api/stock?ticker:aapl ")
